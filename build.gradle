@@ -1,0 +1,103 @@
+import com.github.jk1.license.render.*
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "http://repository.activeeon.com/content/groups/proactive/"
+        }
+
+    }
+
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.3.RELEASE'
+        classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
+        classpath "org.ow2.proactive:coding-rules:1.0.0"
+        classpath "io.spring.gradle:dependency-management-plugin:0.6.1.RELEASE"
+        classpath 'com.github.jk1:gradle-license-report:1.7'
+    }
+
+    dependencies {
+        delete "gradle/ext"
+        ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
+    }
+}
+
+
+
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'java'
+    id 'maven'
+}
+
+apply from: "$rootDir/gradle/ext/coding-format.gradle"
+apply plugin: "io.spring.dependency-management"
+apply plugin: 'com.github.jk1.dependency-license-report'
+apply plugin: 'maven'
+
+group = 'org.ow2.proactive'
+version = version
+
+
+// Configure the maven repository deployment
+install {
+    repositories.mavenInstaller {
+            // Set the version
+            pom.version = version
+            // Set the group/namespace for the maven repository deployment.
+            pom.groupId = 'org.ow2.proactive'
+            // Give the artifact a 'base name' (The version is added to the 'base name')
+            pom.artifactId = 'microservices-common'
+    }
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+repositories {
+    if (project.hasProperty('local')) mavenLocal()
+    maven {
+        url "http://repository.activeeon.com/content/groups/proactive/"
+    }
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "org.projectlombok:lombok"
+}
+
+dependencyManagement {
+    imports {
+      mavenBom "org.ow2.proactive:parent-bom:${version}"
+    }
+}
+
+licenseReport {
+    configurations = ['runtime']
+    renderers = [new InventoryHtmlReportRenderer()]
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            snapshotRepository(url: "http://repository.activeeon.com/content/repositories/snapshots/") {
+                authentication(userName: "${System.getProperty('nexusUsername')}",
+                        password: "${System.getProperty('nexusPassword')}")
+            }
+            repository(url: "http://repository.activeeon.com/content/repositories/releases/") {
+                authentication(userName: "${System.getProperty('nexusUsername')}",
+                        password: "${System.getProperty('nexusPassword')}")
+            }
+        }
+    }
+}
