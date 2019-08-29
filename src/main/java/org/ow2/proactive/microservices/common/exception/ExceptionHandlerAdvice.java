@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
 
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,11 +42,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import lombok.extern.log4j.Log4j;
 
+public abstract class ExceptionHandlerAdvice {
 
-@Log4j
-public class ExceptionHandlerAdvice {
+    private Logger log;
+
+    protected ExceptionHandlerAdvice(Logger logger) {
+        this.log = logger;
+    }
 
     @ExceptionHandler(ClientException.class)
     public ResponseEntity clientErrorHandler(Exception exception) throws Exception {
