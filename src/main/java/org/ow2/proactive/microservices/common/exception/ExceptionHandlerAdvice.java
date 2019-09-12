@@ -52,7 +52,7 @@ public abstract class ExceptionHandlerAdvice {
     }
 
     @ExceptionHandler(ClientException.class)
-    public ResponseEntity clientErrorHandler(Exception exception) throws Exception {
+    public @ResponseBody ResponseEntity clientErrorHandler(Exception exception) throws Exception {
         log.warn("Exception: " + exception.getLocalizedMessage());
 
         HttpStatus responseStatusCode = resolveAnnotatedResponseStatus(exception);
