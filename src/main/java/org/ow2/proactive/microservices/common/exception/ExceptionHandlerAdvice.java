@@ -104,7 +104,8 @@ public abstract class ExceptionHandlerAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public @ResponseBody ResponseEntity<Object> springErrorHandler(HttpMessageNotReadableException e) {
         log.info("HttpMessageNotReadableException caught by ExceptionHandlerAdvice", e);
-        return createClientErrorResponseEntity(HttpStatus.BAD_REQUEST, new ClientException("ill formed body"));
+        return createClientErrorResponseEntity(HttpStatus.BAD_REQUEST,
+                                               new ClientException("ill formed body: " + e.getMessage()));
     }
 
     /**
@@ -116,7 +117,8 @@ public abstract class ExceptionHandlerAdvice {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public @ResponseBody ResponseEntity<Object> springErrorHandler(MethodArgumentTypeMismatchException e) {
         log.info("MethodArgumentTypeMismatchException caught by ExceptionHandlerAdvice", e);
-        return createClientErrorResponseEntity(HttpStatus.BAD_REQUEST, new ClientException("wrong type parameter"));
+        return createClientErrorResponseEntity(HttpStatus.BAD_REQUEST,
+                                               new ClientException("wrong type parameter " + e.getMessage()));
     }
 
     /**
@@ -128,7 +130,8 @@ public abstract class ExceptionHandlerAdvice {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public @ResponseBody ResponseEntity<Object> springErrorHandler(MissingServletRequestParameterException e) {
         log.info("MissingServletRequestParameterException caught by ExceptionHandlerAdvice", e);
-        return createClientErrorResponseEntity(HttpStatus.BAD_REQUEST, new ClientException("missing parameter"));
+        return createClientErrorResponseEntity(HttpStatus.BAD_REQUEST,
+                                               new ClientException("missing parameter: " + e.getMessage()));
     }
 
     /**
