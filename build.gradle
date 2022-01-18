@@ -3,7 +3,6 @@ import com.github.jk1.license.render.*
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
     maven {
             url "https://plugins.gradle.org/m2/"
         }
@@ -68,7 +67,6 @@ repositories {
         url "http://repository.activeeon.com/content/groups/proactive/"
     }
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
