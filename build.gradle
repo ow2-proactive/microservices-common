@@ -33,6 +33,7 @@ plugins {
     id 'idea'
     id 'java'
     id 'maven'
+    id 'project-report'
 }
 
 apply from: "$rootDir/gradle/ext/coding-format.gradle"
@@ -70,7 +71,10 @@ repositories {
 }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+    compile ("org.springframework.boot:spring-boot-starter-web") {
+        exclude module: "spring-boot-starter-tomcat"
+    }
     compile "org.projectlombok:lombok"
 
     // Logger
