@@ -41,19 +41,16 @@ apply plugin: "io.spring.dependency-management"
 apply plugin: 'com.github.jk1.dependency-license-report'
 apply plugin: 'maven'
 
-group = 'org.ow2.proactive'
-version = version
-
 
 // Configure the maven repository deployment
 install {
     repositories.mavenInstaller {
-            // Set the version
-            pom.version = version
-            // Set the group/namespace for the maven repository deployment.
-            pom.groupId = 'org.ow2.proactive'
-            // Give the artifact a 'base name' (The version is added to the 'base name')
-            pom.artifactId = 'microservices-common'
+        // Set the version
+        pom.version = project.version
+        // Set the group/namespace for the maven repository deployment.
+        pom.groupId = project.groupId
+        // Give the artifact a 'base name' (The version is added to the 'base name')
+        pom.artifactId = project.artifactId
     }
 }
 
@@ -96,6 +93,13 @@ licenseReport {
 uploadArchives {
     repositories {
         mavenDeployer {
+            // Set the version
+            pom.version = project.version
+            // Set the group/namespace for the maven repository deployment.
+            pom.groupId = project.groupId
+            // Give the artifact a 'base name' (The version is added to the 'base name')
+            pom.artifactId = project.artifactId
+
             snapshotRepository(url: "http://repository.activeeon.com/content/repositories/snapshots/") {
                 authentication(userName: "${System.getProperty('nexusUsername')}",
                         password: "${System.getProperty('nexusPassword')}")
