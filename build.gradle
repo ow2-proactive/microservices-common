@@ -48,9 +48,9 @@ install {
         // Set the version
         pom.version = project.version
         // Set the group/namespace for the maven repository deployment.
-        pom.groupId = project.groupId
+        pom.groupId = 'org.ow2.proactive'
         // Give the artifact a 'base name' (The version is added to the 'base name')
-        pom.artifactId = project.artifactId
+        pom.artifactId = 'microservices-common'
     }
 }
 
@@ -99,7 +99,7 @@ uploadArchives {
             // Set the version
             pom.version = project.version
             // Set the group/namespace for the maven repository deployment.
-            pom.groupId = project.groupId
+            pom.groupId = 'org.ow2.proactive'
             // Give the artifact a 'base name' (The version is added to the 'base name')
             pom.artifactId = 'microservices-common'
 
