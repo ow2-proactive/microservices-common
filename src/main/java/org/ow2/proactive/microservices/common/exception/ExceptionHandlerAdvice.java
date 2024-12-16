@@ -30,6 +30,7 @@ import java.io.StringWriter;
 import java.util.Optional;
 
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,10 +43,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+
 
 public abstract class ExceptionHandlerAdvice {
 
     private Logger log;
+
+    @Getter(value = AccessLevel.PUBLIC)
+    @Value("${pa.hide.exceptions:true}")
+    private Boolean hideExceptions;
 
     protected ExceptionHandlerAdvice(Logger logger) {
         this.log = logger;
@@ -53,7 +61,12 @@ public abstract class ExceptionHandlerAdvice {
 
     @ExceptionHandler(ClientException.class)
     public ResponseEntity clientErrorHandler(Exception exception) throws Exception {
-        log.warn("Exception: " + exception.getLocalizedMessage());
+        if (!hideExceptions) {
+            log.warn("Exception: " + exception.getLocalizedMessage());
+        } else {
+            // log full exception when it is hidden from the response
+            log.warn("Exception: " + exception.getLocalizedMessage(), exception);
+        }
 
         HttpStatus responseStatusCode = resolveAnnotatedResponseStatus(exception);
 
@@ -71,7 +84,7 @@ public abstract class ExceptionHandlerAdvice {
     @ExceptionHandler(Exception.class)
     public @ResponseBody ResponseEntity<Object> serverErrorHandler(Exception e) {
         final HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-        log.error("Server exception" + e.getMessage(), e);
+        log.error("Server exception: " + e.getMessage(), e);
         return new ResponseEntity(new ErrorResource(httpStatus.value(), httpStatus.getReasonPhrase(), getStackTrace(e)),
                                   httpStatus);
     }
@@ -150,7 +163,12 @@ public abstract class ExceptionHandlerAdvice {
     private ResponseEntity createClientErrorResponseEntity(HttpStatus httpStatus, Exception e) {
         String errorMessage = httpStatus.getReasonPhrase() +
                               Optional.ofNullable(e.getMessage()).map(message -> ", " + message).orElse("");
-        log.info("Client exception, " + errorMessage);
+        if (!hideExceptions) {
+            log.info("Client exception: " + errorMessage);
+        } else {
+            // log full exception when it is hidden from the response
+            log.info("Client exception: " + errorMessage, e);
+        }
 
         return new ResponseEntity(new ErrorResource(httpStatus.value(), errorMessage, getStackTrace(e)), httpStatus);
     }
@@ -164,10 +182,14 @@ public abstract class ExceptionHandlerAdvice {
     }
 
     private String getStackTrace(final Throwable throwable) {
-        final StringWriter sw = new StringWriter();
-        final PrintWriter pw = new PrintWriter(sw, true);
-        throwable.printStackTrace(pw);
-        return sw.getBuffer().toString();
+        if (!hideExceptions) {
+            final StringWriter sw = new StringWriter();
+            final PrintWriter pw = new PrintWriter(sw, true);
+            throwable.printStackTrace(pw);
+            return sw.getBuffer().toString();
+        } else {
+            return null;
+        }
     }
 
 }
